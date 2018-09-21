@@ -1,0 +1,33 @@
+--- a/net/minecraft/server/MinecraftServer.java
++++ b/net/minecraft/server/MinecraftServer.java
+@@ -553,16 +553,26 @@
+             this.applyServerIconToResponse(this.statusResponse);
+ 
+             while(this.serverRunning) {
++               // tick warp
++               if (quickcarpet.TickCommand.scheduledTicksToWarp > 0) {
++                  if (quickcarpet.TickCommand.continueTickWarp()) {
++                      this.tick(this::func_212379_aT);
++                      this.serverTime = Util.milliTime();
++                      this.serverIsRunning = true;
++                  }
++                  continue;
++               }
++               
+                long i = Util.milliTime() - this.serverTime;
+                if (i > 2000L && this.serverTime - this.timeOfLastWarning >= 15000L) {
+-                  long j = i / 50L;
+-                  LOGGER.warn("Can't keep up! Is the server overloaded? Running {}ms or {} ticks behind", i, j);
+-                  this.serverTime += j * 50L;
++                  long j = i / quickcarpet.TickCommand.mspt;
++                  //LOGGER.warn("Can't keep up! Is the server overloaded? Running {}ms or {} ticks behind", i, j);
++                  this.serverTime += j * quickcarpet.TickCommand.mspt;
+                   this.timeOfLastWarning = this.serverTime;
+                }
+ 
+                this.tick(this::func_212379_aT);
+-               this.serverTime += 50L;
++               this.serverTime += quickcarpet.TickCommand.mspt;
+ 
+                while(this.func_212379_aT()) {
+                   Thread.sleep(1L);
