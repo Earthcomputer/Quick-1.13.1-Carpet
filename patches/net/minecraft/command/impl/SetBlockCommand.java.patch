@@ -1,0 +1,28 @@
+--- a/net/minecraft/command/impl/SetBlockCommand.java
++++ b/net/minecraft/command/impl/SetBlockCommand.java
+@@ -44,6 +44,8 @@
+       if (p_198683_4_ != null && !p_198683_4_.test(new BlockWorldState(worldserver, p_198683_1_, true))) {
+          throw field_198689_a.create();
+       } else {
++         if (quickcarpet.FillUpdatesCommand.fillUpdates)
++            quickcarpet.FillUpdatesCommand.updatesEnabled = false;
+          boolean flag;
+          if (p_198683_3_ == SetBlockCommand.Mode.DESTROY) {
+             worldserver.destroyBlock(p_198683_1_, true);
+@@ -56,11 +58,16 @@
+ 
+             flag = true;
+          }
++         
+ 
+          if (flag && !p_198683_2_.place(worldserver, p_198683_1_, 2)) {
++            if (quickcarpet.FillUpdatesCommand.fillUpdates)
++               quickcarpet.FillUpdatesCommand.updatesEnabled = true;
+             throw field_198689_a.create();
+          } else {
+             worldserver.notifyNeighbors(p_198683_1_, p_198683_2_.getBlockState().getBlock());
++            if (quickcarpet.FillUpdatesCommand.fillUpdates)
++               quickcarpet.FillUpdatesCommand.updatesEnabled = true;
+             p_198683_0_.sendFeedback(new TextComponentTranslation("commands.setblock.success", new Object[]{p_198683_1_.getX(), p_198683_1_.getY(), p_198683_1_.getZ()}), true);
+             return 1;
+          }

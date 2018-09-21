@@ -1,0 +1,10 @@
+--- a/net/minecraft/block/state/IBlockState.java
++++ b/net/minecraft/block/state/IBlockState.java
+@@ -236,6 +236,7 @@
+    }
+ 
+    default void neighborChanged(World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
++      if (quickcarpet.FillUpdatesCommand.updatesEnabled)
+       this.getBlock().neighborChanged(this, worldIn, pos, blockIn, fromPos);
+    }
+ 

@@ -1,6 +1,6 @@
 --- a/net/minecraft/command/impl/FillCommand.java
 +++ b/net/minecraft/command/impl/FillCommand.java
-@@ -59,8 +59,8 @@
+@@ -59,13 +59,15 @@
  
     private static int doFill(CommandSource source, MutableBoundingBox area, BlockStateInput newBlock, FillCommand.Mode mode, @Nullable Predicate<BlockWorldState> replacingPredicate) throws CommandSyntaxException {
        int i = area.getXSize() * area.getYSize() * area.getZSize();
@@ -11,3 +11,20 @@
        } else {
           List<BlockPos> list = Lists.<BlockPos>newArrayList();
           WorldServer worldserver = source.getWorld();
+          int j = 0;
+ 
++         if (quickcarpet.FillUpdatesCommand.fillUpdates)
++            quickcarpet.FillUpdatesCommand.updatesEnabled = false;
+          for(BlockPos blockpos : BlockPos.MutableBlockPos.getAllInBox(area.minX, area.minY, area.minZ, area.maxX, area.maxY, area.maxZ)) {
+             if (replacingPredicate == null || replacingPredicate.test(new BlockWorldState(worldserver, blockpos, true))) {
+                BlockStateInput blockstateinput = mode.filter.filter(area, blockpos, newBlock, worldserver);
+@@ -87,6 +89,9 @@
+             Block block = worldserver.getBlockState(blockpos1).getBlock();
+             worldserver.notifyNeighbors(blockpos1, block);
+          }
++         
++         if (quickcarpet.FillUpdatesCommand.fillUpdates)
++            quickcarpet.FillUpdatesCommand.updatesEnabled = true;
+ 
+          if (j == 0) {
+             throw FAILED_EXCEPTION.create();

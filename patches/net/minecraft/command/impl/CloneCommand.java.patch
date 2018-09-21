@@ -11,3 +11,22 @@
           } else {
              WorldServer worldserver = source.getWorld();
              if (worldserver.isAreaLoaded(mutableboundingbox) && worldserver.isAreaLoaded(mutableboundingbox1)) {
+@@ -121,6 +121,8 @@
+                   }
+                }
+ 
++               if (!quickcarpet.FillUpdatesCommand.fillUpdates)
++                  quickcarpet.FillUpdatesCommand.updatesEnabled = false;
+                if (cloneMode == CloneCommand.Mode.MOVE) {
+                   for(BlockPos blockpos3 : deque) {
+                      TileEntity tileentity1 = worldserver.getTileEntity(blockpos3);
+@@ -175,6 +177,9 @@
+                for(CloneCommand.BlockInfo clonecommand$blockinfo3 : list4) {
+                   worldserver.notifyNeighbors(clonecommand$blockinfo3.pos, clonecommand$blockinfo3.state.getBlock());
+                }
++               
++               if (quickcarpet.FillUpdatesCommand.fillUpdates)
++                  quickcarpet.FillUpdatesCommand.updatesEnabled = true;
+ 
+                worldserver.getPendingBlockTicks().copyTicks(mutableboundingbox, blockpos);
+                if (i1 == 0) {
