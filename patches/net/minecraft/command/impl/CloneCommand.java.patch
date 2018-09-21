@@ -1,0 +1,13 @@
+--- a/net/minecraft/command/impl/CloneCommand.java
++++ b/net/minecraft/command/impl/CloneCommand.java
+@@ -85,8 +85,8 @@
+          throw OVERLAP_EXCEPTION.create();
+       } else {
+          int i = mutableboundingbox.getXSize() * mutableboundingbox.getYSize() * mutableboundingbox.getZSize();
+-         if (i > 32768) {
+-            throw CLONE_TOO_BIG_EXCEPTION.create(32768, i);
++         if (i > quickcarpet.FillLimitCommand.fillLimit) {
++            throw CLONE_TOO_BIG_EXCEPTION.create(quickcarpet.FillLimitCommand.fillLimit, i);
+          } else {
+             WorldServer worldserver = source.getWorld();
+             if (worldserver.isAreaLoaded(mutableboundingbox) && worldserver.isAreaLoaded(mutableboundingbox1)) {

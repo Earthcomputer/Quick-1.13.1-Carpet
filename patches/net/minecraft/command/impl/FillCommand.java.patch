@@ -1,0 +1,13 @@
+--- a/net/minecraft/command/impl/FillCommand.java
++++ b/net/minecraft/command/impl/FillCommand.java
+@@ -59,8 +59,8 @@
+ 
+    private static int doFill(CommandSource source, MutableBoundingBox area, BlockStateInput newBlock, FillCommand.Mode mode, @Nullable Predicate<BlockWorldState> replacingPredicate) throws CommandSyntaxException {
+       int i = area.getXSize() * area.getYSize() * area.getZSize();
+-      if (i > 32768) {
+-         throw TOO_BIG_EXCEPTION.create(32768, i);
++      if (i > quickcarpet.FillLimitCommand.fillLimit) {
++         throw TOO_BIG_EXCEPTION.create(quickcarpet.FillLimitCommand.fillLimit, i);
+       } else {
+          List<BlockPos> list = Lists.<BlockPos>newArrayList();
+          WorldServer worldserver = source.getWorld();
