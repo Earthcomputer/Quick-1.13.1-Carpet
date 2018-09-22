@@ -1,0 +1,61 @@
+--- a/net/minecraft/tileentity/TileEntityHopper.java
++++ b/net/minecraft/tileentity/TileEntityHopper.java
+@@ -3,7 +3,9 @@
+ import java.util.List;
+ import java.util.function.Supplier;
+ import java.util.stream.Collectors;
++
+ import javax.annotation.Nullable;
++
+ import net.minecraft.block.Block;
+ import net.minecraft.block.BlockChest;
+ import net.minecraft.block.BlockHopper;
+@@ -17,8 +19,10 @@
+ import net.minecraft.inventory.IInventory;
+ import net.minecraft.inventory.ISidedInventory;
+ import net.minecraft.inventory.ItemStackHelper;
++import net.minecraft.item.EnumDyeColor;
+ import net.minecraft.item.ItemStack;
+ import net.minecraft.nbt.NBTTagCompound;
++import net.minecraft.tags.BlockTags;
+ import net.minecraft.util.EntitySelectors;
+ import net.minecraft.util.EnumFacing;
+ import net.minecraft.util.ITickable;
+@@ -27,9 +31,11 @@
+ import net.minecraft.util.math.BlockPos;
+ import net.minecraft.util.math.shapes.IBooleanFunction;
+ import net.minecraft.util.math.shapes.VoxelShapes;
++import net.minecraft.util.registry.IRegistry;
+ import net.minecraft.util.text.ITextComponent;
+ import net.minecraft.util.text.TextComponentTranslation;
+ import net.minecraft.world.World;
++import quickcarpet.HopperCounter;
+ 
+ public class TileEntityHopper extends TileEntityLockableLoot implements IHopper, ITickable {
+    private NonNullList<ItemStack> inventory = NonNullList.<ItemStack>withSize(5, ItemStack.EMPTY);
+@@ -159,6 +165,25 @@
+    }
+ 
+    private boolean transferItemsOut() {
++       BlockPos pos = this.pos.offset(getBlockState().get(BlockHopper.FACING));
++       Block block = world.getBlockState(pos).getBlock();
++       if (BlockTags.WOOL.contains(block)) {
++           String name = IRegistry.field_212618_g.getKey(block).getPath();
++           if (name.endsWith("_wool")) {
++               name = name.substring(0, name.length() - 5);
++               EnumDyeColor color = EnumDyeColor.byTranslationKey(name);
++               if (color != null) {
++                   for (int slot = 0; slot < getSizeInventory(); slot++) {
++                       if (!getStackInSlot(slot).isEmpty()) {
++                           ItemStack stack = getStackInSlot(slot);
++                           HopperCounter.count_hopper_items(world, color, stack);
++                           setInventorySlotContents(slot, ItemStack.EMPTY);
++                       }
++                   }
++               }
++           }
++       }
++      
+       IInventory iinventory = this.getInventoryForHopperTransfer();
+       if (iinventory == null) {
+          return false;
