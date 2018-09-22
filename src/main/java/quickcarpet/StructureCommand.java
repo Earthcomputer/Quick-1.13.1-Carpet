@@ -70,7 +70,7 @@ public class StructureCommand
                         0));
         ArgumentBuilder<CommandSource, ?> load = literal("load")
                 .then(argument("template", TemplateArgument.template())
-                    .suggests(TemplateArgument::suggestTriggers)
+                    //.suggests(TemplateArgument::suggestTriggers)
                     .executes(ctx -> loadStructure(ctx.getSource(),
                             TemplateArgument.getTemplate(ctx, "template"),
                             new BlockPos(ctx.getSource().getPos()),
@@ -131,7 +131,7 @@ public class StructureCommand
         
         ArgumentBuilder<CommandSource, ?> save = literal("save")
                 .then(argument("template", TemplateArgument.template())
-                    .suggests(TemplateArgument::suggestTriggers)
+                    //.suggests(TemplateArgument::suggestTriggers)
                     .then(argument("from", BlockPosArgument.blockPos())
                         .then(argument("to", BlockPosArgument.blockPos())
                             .executes(ctx -> saveStructure(ctx.getSource(),
