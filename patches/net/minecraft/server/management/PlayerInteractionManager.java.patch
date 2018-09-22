@@ -1,0 +1,11 @@
+--- a/net/minecraft/server/management/PlayerInteractionManager.java
++++ b/net/minecraft/server/management/PlayerInteractionManager.java
+@@ -299,6 +299,8 @@
+       } else {
+          boolean flag = !player.getHeldItemMainhand().isEmpty() || !player.getHeldItemOffhand().isEmpty();
+          boolean flag1 = player.isSneaking() && flag;
++         if (!flag1 && quickcarpet.BlockRotator.cactusRotate(worldIn, pos, worldIn.getBlockState(pos), player, hand, facing, hitX, hitY, hitZ))
++             return EnumActionResult.PASS;
+          if (!flag1 && iblockstate.onBlockActivated(worldIn, pos, player, hand, facing, hitX, hitY, hitZ)) {
+             return EnumActionResult.SUCCESS;
+          } else if (!stack.isEmpty() && !player.getCooldownTracker().hasCooldown(stack.getItem())) {
