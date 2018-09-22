@@ -33,14 +33,14 @@
 +               int l4 = (int)(Math.pow(2.0,(quickcarpet.SpawnReporter.mobcap_exponent/4)) * enumcreaturetype.getMaxNumberOfCreature() * i / MOB_COUNT_DIV);
                 int i5 = worldServerIn.countEntities(enumcreaturetype.getBaseClass(), l4);
 +               //CM start
-+               quickcarpet.SpawnReporter.mobcaps.get(did).put(enumcreaturetype, new Tuple<>(k4, l4));
++               quickcarpet.SpawnReporter.mobcaps.get(did).put(enumcreaturetype, new Tuple<>(i5, l4));
 +               int tries = quickcarpet.SpawnReporter.spawn_tries.get(type_code);
 +               if (quickcarpet.SpawnReporter.track_spawns > 0L)
 +               {
 +                   quickcarpet.SpawnReporter.spawn_attempts.put(group_code, quickcarpet.SpawnReporter.spawn_attempts.get(group_code) + tries);
-+                   quickcarpet.SpawnReporter.spawn_cap_count.put(group_code, quickcarpet.SpawnReporter.spawn_cap_count.get(group_code) + k4);
++                   quickcarpet.SpawnReporter.spawn_cap_count.put(group_code, quickcarpet.SpawnReporter.spawn_cap_count.get(group_code) + i5);
 +               }
-+               if (quickcarpet.SpawnReporter.mock_spawns) { k4 = 0; } // no mobcaps
++               if (quickcarpet.SpawnReporter.mock_spawns) { i5 = 0; } // no mobcaps
 +               //CM end
                 if (i5 <= l4) {
                    BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
@@ -64,14 +64,14 @@
 +                                             {
 +                                                 String species = EntityType.getId(entityliving.getType()).toString();
 +                                                 quickcarpet.SpawnReporter.registerSpawn(entityliving, type_code, species, blockpos$mutableblockpos);
-+                                                 if (quickcarpet.SpawnReporter.mock_spawns)
-+                                                 {
-+                                                     entityliving.remove();
-+                                                 }
-+                                                 else
-+                                                 {
-+                                                     worldServerIn.spawnEntity(entityliving);
-+                                                 }
++                                             }
++                                             if (quickcarpet.SpawnReporter.mock_spawns)
++                                             {
++                                                 entityliving.remove();
++                                             }
++                                             else
++                                             {
++                                                 worldServerIn.spawnEntity(entityliving);
 +                                             }
 +                                             //CM end
                                            } else {
