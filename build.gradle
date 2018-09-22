@@ -170,21 +170,7 @@ class JarFilter {
     }
     static def filterJar(File jarIn, File jarOut, Closure transformer, Map<File, String> additionalDirs = [:]) {
         def existing = [] as HashSet
-        def zipIn = new ZipFile(jarIn)
         def zipOut = new ZipOutputStream(new FileOutputStream(jarOut))
-        zipIn.entries().each { entryIn ->
-            def filter = new JarFilter(entryIn.getName(), zipIn.getInputStream(entryIn), false)
-            transformer.delegate = filter
-            def content = transformer.call()
-            if (content != null) {
-                def entryOut = new ZipEntry(filter.filename)
-                existing << filter.filename
-                zipOut.putNextEntry(entryOut)
-                zipOut << content
-                zipOut.closeEntry()
-            }
-        }
-        zipIn.close()
         additionalDirs.each { additionalDir, prefix ->
             additionalDir.eachFileRecurse { file ->
                 def filter = new JarFilter(prefix + additionalDir.toPath().relativize(file.toPath()).toString().replace(File.separator, '/'), file.isDirectory() ? new NullInputStream(0) : file.newInputStream(), true)
@@ -199,6 +185,20 @@ class JarFilter {
                 }
             }
         }
+        def zipIn = new ZipFile(jarIn)
+        zipIn.entries().each { entryIn ->
+            def filter = new JarFilter(entryIn.getName(), zipIn.getInputStream(entryIn), false)
+            transformer.delegate = filter
+            def content = transformer.call()
+            if (content != null && !existing.contains(filter.filename)) {
+                def entryOut = new ZipEntry(filter.filename)
+                existing << filter.filename
+                zipOut.putNextEntry(entryOut)
+                zipOut << content
+                zipOut.closeEntry()
+            }
+        }
+        zipIn.close()
         zipOut.close()
     }
 }
@@ -252,10 +252,7 @@ class FixMcpConfigTask extends DefaultTask {
                 inputs.file proj.downloadConfig.output
                 outputs.file 'build/mcp_config.zip'
             }
-            println(proj.tasks.getByName('fixMcpConfig'))
             proj.loadConfig.dependsOn proj.fixMcpConfig
-        } else {
-            println("Already registered")
         }
     }
 }

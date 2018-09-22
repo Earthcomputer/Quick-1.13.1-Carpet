@@ -12,9 +12,9 @@
 @@ -56,7 +56,7 @@
  
     public boolean mouseReleased(double p_mouseReleased_1_, double p_mouseReleased_3_, int p_mouseReleased_5_) {
-       this.setDragging(false);
+       this.func_195072_d(false);
 -      return super.mouseReleased(p_mouseReleased_1_, p_mouseReleased_3_, p_mouseReleased_5_);
 +      return IGuiEventListenerDeferred.super.mouseReleased(p_mouseReleased_1_, p_mouseReleased_3_, p_mouseReleased_5_);
     }
  
-    public void focusOn(@Nullable IGuiEventListener p_205725_1_) {
+    public void func_205725_b(@Nullable IGuiEventListener p_205725_1_) {
