@@ -13,7 +13,7 @@
           WorldServer worldserver = source.getWorld();
           int j = 0;
  
-+         if (quickcarpet.FillUpdatesCommand.fillUpdates)
++         if (!quickcarpet.FillUpdatesCommand.fillUpdates)
 +            quickcarpet.FillUpdatesCommand.updatesEnabled = false;
           for(BlockPos blockpos : BlockPos.MutableBlockPos.getAllInBox(area.minX, area.minY, area.minZ, area.maxX, area.maxY, area.maxZ)) {
              if (replacingPredicate == null || replacingPredicate.test(new BlockWorldState(worldserver, blockpos, true))) {
@@ -23,7 +23,7 @@
              worldserver.notifyNeighbors(blockpos1, block);
           }
 +         
-+         if (quickcarpet.FillUpdatesCommand.fillUpdates)
++         if (!quickcarpet.FillUpdatesCommand.fillUpdates)
 +            quickcarpet.FillUpdatesCommand.updatesEnabled = true;
  
           if (j == 0) {

@@ -25,7 +25,7 @@
                    worldserver.notifyNeighbors(clonecommand$blockinfo3.pos, clonecommand$blockinfo3.state.getBlock());
                 }
 +               
-+               if (quickcarpet.FillUpdatesCommand.fillUpdates)
++               if (!quickcarpet.FillUpdatesCommand.fillUpdates)
 +                  quickcarpet.FillUpdatesCommand.updatesEnabled = true;
  
                 worldserver.getPendingBlockTicks().copyTicks(mutableboundingbox, blockpos);
