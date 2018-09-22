@@ -1,6 +1,6 @@
 --- a/net/minecraft/block/state/IBlockState.java
 +++ b/net/minecraft/block/state/IBlockState.java
-@@ -236,6 +236,7 @@
+@@ -236,14 +236,17 @@
     }
  
     default void neighborChanged(World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
@@ -8,3 +8,23 @@
        this.getBlock().neighborChanged(this, worldIn, pos, blockIn, fromPos);
     }
  
+    default void updateNeighbors(IWorld worldIn, BlockPos pos, int flags) {
++      if (quickcarpet.FillUpdatesCommand.updatesEnabled)
+       this.getBlock().updateNeighbors(this, worldIn, pos, flags);
+    }
+ 
+    default void updateDiagonalNeighbors(IWorld worldIn, BlockPos pos, int flags) {
++      if (quickcarpet.FillUpdatesCommand.updatesEnabled)
+       this.getBlock().updateDiagonalNeighbors(this, worldIn, pos, flags);
+    }
+ 
+@@ -292,7 +295,9 @@
+    }
+ 
+    default IBlockState updatePostPlacement(EnumFacing face, IBlockState queried, IWorld worldIn, BlockPos currentPos, BlockPos offsetPos) {
++      if (quickcarpet.FillUpdatesCommand.updatesEnabled)
+       return this.getBlock().updatePostPlacement(this, face, queried, worldIn, currentPos, offsetPos);
++      else return this;
+    }
+ 
+    default boolean allowsMovement(IBlockReader worldIn, BlockPos pos, PathType type) {
