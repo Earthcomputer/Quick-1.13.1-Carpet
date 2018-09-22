@@ -1,0 +1,11 @@
+--- a/net/minecraft/util/Util.java
++++ b/net/minecraft/util/Util.java
+@@ -208,7 +208,7 @@
+       @OnlyIn(Dist.CLIENT)
+       public void openURL(URL url) {
+          try {
+-            Process process = (Process)AccessController.doPrivileged(() -> {
++            Process process = (Process)AccessController.doPrivileged((java.security.PrivilegedExceptionAction)() -> {
+                return Runtime.getRuntime().exec(this.getOpenCommandLine(url));
+             });
+ 

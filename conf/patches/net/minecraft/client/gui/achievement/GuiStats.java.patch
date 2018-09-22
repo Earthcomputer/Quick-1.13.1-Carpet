@@ -1,0 +1,11 @@
+--- a/net/minecraft/client/gui/achievement/GuiStats.java
++++ b/net/minecraft/client/gui/achievement/GuiStats.java
+@@ -100,7 +100,7 @@
+          guibutton1.enabled = false;
+       }
+ 
+-      this.children.add(() -> {
++      this.children.add((net.minecraft.client.gui.IGuiEventListenerDeferred)() -> {
+          return this.displaySlot;
+       });
+    }

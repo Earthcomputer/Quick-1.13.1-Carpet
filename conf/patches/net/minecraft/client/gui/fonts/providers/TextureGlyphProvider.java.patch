@@ -1,0 +1,11 @@
+--- a/net/minecraft/client/gui/fonts/providers/TextureGlyphProvider.java
++++ b/net/minecraft/client/gui/fonts/providers/TextureGlyphProvider.java
+@@ -170,7 +170,7 @@
+       }
+ 
+       public float getBearingY() {
+-         return super.getBearingY() + 7.0F - (float)this.ascent;
++         return IGlyphInfo.super.getBearingY() + 7.0F - (float)this.ascent;
+       }
+ 
+       public void uploadGlyph(int xOffset, int yOffset) {
