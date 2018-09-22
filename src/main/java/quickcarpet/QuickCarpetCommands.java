@@ -10,6 +10,7 @@ public class QuickCarpetCommands {
         FillLimitCommand.register(dispatcher);
         FillUpdatesCommand.register(dispatcher);
         TickCommand.register(dispatcher);
+        CounterCommand.register(dispatcher);
         StructureCommand.register(dispatcher);
     }
     
