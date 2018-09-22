@@ -20,6 +20,7 @@ import java.util.Random;
 import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -30,11 +31,14 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 
 import net.minecraft.command.CommandSource;
+import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.command.arguments.BlockPosArgument;
 import net.minecraft.init.Blocks;
 import net.minecraft.server.MinecraftServer;
@@ -57,91 +61,101 @@ public class StructureCommand
     public static final DynamicCommandExceptionType TEMPLATE_INVALID_EXCEPTION = 
         new DynamicCommandExceptionType(template -> new TextComponentTranslation("Template %s doesn't exist", template));
     
+    private static final Pattern WORD_PATTERN = Pattern.compile("\\w+");
+    
+    public static final SuggestionProvider<CommandSource> TEMPLATE_SUGGESTER = (ctx, builder) -> {
+        TemplateManager manager = MinecraftServer.INSTANCE.getWorld(DimensionType.OVERWORLD).getStructureTemplateManager();
+        return ISuggestionProvider.suggest(listStructures(manager)
+                .stream().map(ResourceLocation::toString)
+                .map(s -> WORD_PATTERN.matcher(s).matches() ? s : "\"" + s + "\"")
+                .collect(Collectors.toList()), builder);
+    };
+    
     public static void register(CommandDispatcher<CommandSource> dispatcher)
     {
         ArgumentBuilder<CommandSource, ?> posArgument = argument("pos", BlockPosArgument.blockPos())
                 .executes(ctx -> loadStructure(ctx.getSource(),
-                        TemplateArgument.getTemplate(ctx, "template"),
+                        StringArgumentType.getString(ctx, "template"),
                         BlockPosArgument.getBlockPos(ctx, "pos"),
                         Mirror.NONE,
                         Rotation.NONE,
                         true,
                         1,
-                        0));
+                        "0"));
         ArgumentBuilder<CommandSource, ?> load = literal("load")
-                .then(argument("template", TemplateArgument.template())
-                    //.suggests(TemplateArgument::suggestTriggers)
+                .then(argument("template", StringArgumentType.string())
+                    .suggests(TEMPLATE_SUGGESTER)
                     .executes(ctx -> loadStructure(ctx.getSource(),
-                            TemplateArgument.getTemplate(ctx, "template"),
+                            StringArgumentType.getString(ctx, "template"),
                             new BlockPos(ctx.getSource().getPos()),
                             Mirror.NONE,
                             Rotation.NONE,
                             true,
                             1,
-                            0))
+                            "0"))
                     .then(posArgument));
         
         createMirrorArgument(posArgument, (mirror, builder1) -> {
             builder1.executes(ctx -> loadStructure(ctx.getSource(),
-                    TemplateArgument.getTemplate(ctx, "template"),
+                    StringArgumentType.getString(ctx, "template"),
                     BlockPosArgument.getBlockPos(ctx, "pos"),
                     mirror,
                     Rotation.NONE,
                     true,
                     1,
-                    0));
+                    "0"));
             createRotationArgument(builder1, (rotation, builder2) -> {
                 builder2.executes(ctx -> loadStructure(ctx.getSource(),
-                        TemplateArgument.getTemplate(ctx, "template"),
+                        StringArgumentType.getString(ctx, "template"),
                         BlockPosArgument.getBlockPos(ctx, "pos"),
                         mirror,
                         rotation,
                         true,
                         1,
-                        0));
+                        "0"));
                 builder2.then(argument("ignoreEntities", BoolArgumentType.bool())
                     .executes(ctx -> loadStructure(ctx.getSource(),
-                            TemplateArgument.getTemplate(ctx, "template"),
+                            StringArgumentType.getString(ctx, "template"),
                             BlockPosArgument.getBlockPos(ctx, "pos"),
                             mirror,
                             rotation,
                             BoolArgumentType.getBool(ctx, "ignoreEntities"),
                             1,
-                            0))
+                            "0"))
                     .then(argument("integrity", FloatArgumentType.floatArg(0, 1))
                         .executes(ctx -> loadStructure(ctx.getSource(),
-                                TemplateArgument.getTemplate(ctx, "template"),
+                                StringArgumentType.getString(ctx, "template"),
                                 BlockPosArgument.getBlockPos(ctx, "pos"),
                                 mirror,
                                 rotation,
                                 BoolArgumentType.getBool(ctx, "ignoreEntities"),
                                 FloatArgumentType.getFloat(ctx, "integrity"),
-                                new Random().nextLong()))
-                        .then(argument("seed", LongArgumentType.longArg())
+                                String.valueOf(new Random().nextLong())))
+                        .then(argument("seed", StringArgumentType.word())
                             .executes(ctx -> loadStructure(ctx.getSource(),
-                                    TemplateArgument.getTemplate(ctx, "template"),
+                                    StringArgumentType.getString(ctx, "template"),
                                     BlockPosArgument.getBlockPos(ctx, "pos"),
                                     mirror,
                                     rotation,
                                     BoolArgumentType.getBool(ctx, "ignoreEntities"),
                                     FloatArgumentType.getFloat(ctx, "integrity"),
-                                    LongArgumentType.getLong(ctx, "seed"))))));
+                                    StringArgumentType.getString(ctx, "seed"))))));
             });
         });
         
         ArgumentBuilder<CommandSource, ?> save = literal("save")
-                .then(argument("template", TemplateArgument.template())
-                    //.suggests(TemplateArgument::suggestTriggers)
+                .then(argument("template", StringArgumentType.string())
+                    .suggests(TEMPLATE_SUGGESTER)
                     .then(argument("from", BlockPosArgument.blockPos())
                         .then(argument("to", BlockPosArgument.blockPos())
                             .executes(ctx -> saveStructure(ctx.getSource(),
-                                    TemplateArgument.getTemplate(ctx, "template"),
+                                    StringArgumentType.getString(ctx, "template"),
                                     BlockPosArgument.getBlockPos(ctx, "from"),
                                     BlockPosArgument.getBlockPos(ctx, "to"),
                                     true))
                             .then(argument("ignoreEntities", BoolArgumentType.bool())
                                 .executes(ctx -> saveStructure(ctx.getSource(),
-                                        TemplateArgument.getTemplate(ctx, "template"),
+                                        StringArgumentType.getString(ctx, "template"),
                                         BlockPosArgument.getBlockPos(ctx, "from"),
                                         BlockPosArgument.getBlockPos(ctx, "to"),
                                         BoolArgumentType.getBool(ctx, "ignoreEntities")))))));
@@ -197,10 +211,17 @@ public class StructureCommand
         builder.then(child);
     }
     
-    private static int loadStructure(CommandSource source, ResourceLocation templateLocation, BlockPos pos, Mirror mirror, Rotation rotation, boolean ignoreEntities, float integrity, long seed) throws CommandSyntaxException
+    private static int loadStructure(CommandSource source, String templateLocation, BlockPos pos, Mirror mirror, Rotation rotation, boolean ignoreEntities, float integrity, String seedStr) throws CommandSyntaxException
     {
+        long seed;
+        try {
+            seed = Long.parseLong(seedStr);
+        } catch (NumberFormatException e) {
+            throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.readerExpectedInt().create();
+        }
+        
         TemplateManager manager = source.getServer().getWorld(DimensionType.OVERWORLD).getStructureTemplateManager();
-        Template template = manager.getTemplate(templateLocation);
+        Template template = manager.getTemplate(new ResourceLocation(templateLocation));
         if (template == null)
             throw TEMPLATE_INVALID_EXCEPTION.create(templateLocation);
         
@@ -218,10 +239,10 @@ public class StructureCommand
     }
     
     @SuppressWarnings("unchecked")
-    private static int saveStructure(CommandSource source, ResourceLocation templateLocation, BlockPos from, BlockPos to, boolean ignoreEntities)
+    private static int saveStructure(CommandSource source, String templateLocation, BlockPos from, BlockPos to, boolean ignoreEntities)
     {
         TemplateManager manager = source.getServer().getWorld(DimensionType.OVERWORLD).getStructureTemplateManager();
-        Template template = manager.getTemplateDefaulted(templateLocation);
+        Template template = manager.getTemplateDefaulted(new ResourceLocation(templateLocation));
         
         MutableBoundingBox bb = new MutableBoundingBox(from, to);
         BlockPos origin = new BlockPos(bb.minX, bb.minY, bb.minZ);
@@ -332,27 +353,32 @@ public class StructureCommand
             throw new AssertionError(e);
         }
         
-        try
+        if (Files.isDirectory(templatesPath))
         {
-            Files.list(templatesPath).map(p -> p.resolve("structures")).flatMap(p -> {
-                try
-                {
-                    return Files.walk(p);
-                }
-                catch (IOException e)
-                {
-                    LogManager.getLogger().error("Unable to list custom structures", e);
-                    return Stream.empty();
-                }
-            }).map(p -> {
-                String s = templatesPath.relativize(p).toString();
-                String[] parts = s.split("/", 3);
-                return new ResourceLocation(parts[0], parts[2]);
-            }).forEach(templates::add);
-        }
-        catch (IOException e)
-        {
-            LogManager.getLogger().error("Unable to list custom structures", e);
+            try
+            {
+                Files.list(templatesPath).map(p -> p.resolve("structures")).filter(Files::isDirectory).flatMap(p -> {
+                    try
+                    {
+                        return Files.walk(p);
+                    }
+                    catch (IOException e)
+                    {
+                        LogManager.getLogger().error("Unable to list custom structures", e);
+                        return Stream.empty();
+                    }
+                }).filter(Files::isRegularFile).filter(p -> p.toString().endsWith(".nbt")).map(p -> {
+                    String s = templatesPath.relativize(p).toString().replace(File.separator, "/");
+                    String[] parts = s.split("/", 3);
+                    if (parts.length < 3)
+                        return null;
+                    return new ResourceLocation(parts[0], parts[2].substring(0, parts[2].length() - 4));
+                }).filter(it -> it != null).forEach(templates::add);
+            }
+            catch (IOException e)
+            {
+                LogManager.getLogger().error("Unable to list custom structures", e);
+            }
         }
         
         Pattern pattern = Pattern.compile(".*data/(\\w+)/structures/([\\w/]+)\\.nbt");
