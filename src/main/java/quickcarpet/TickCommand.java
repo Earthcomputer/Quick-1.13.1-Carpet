@@ -91,7 +91,7 @@ public class TickCommand {
     
     private static void printCompleteMessage() {
         long endTime = Util.nanoTime();
-        long mspt = endTime / 1000000 / ticksWarped;
+        long mspt = (endTime - tickWarpStart) / 1000000 / ticksWarped;
         tickWarpSender.sendFeedback(new TextComponentString("... Finished warp of " + ticksWarped + " ticks with " + mspt + " MSPT"), true);
         tickWarpSender = null;
     }
