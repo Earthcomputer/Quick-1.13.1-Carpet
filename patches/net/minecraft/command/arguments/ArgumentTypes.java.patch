@@ -1,0 +1,10 @@
+--- a/net/minecraft/command/arguments/ArgumentTypes.java
++++ b/net/minecraft/command/arguments/ArgumentTypes.java
+@@ -71,6 +71,7 @@
+       register(new ResourceLocation("minecraft:item_enchantment"), EnchantmentArgument.class, new ArgumentSerializer(EnchantmentArgument::itemEnchantment));
+       register(new ResourceLocation("minecraft:entity_summon"), EntitySummonArgument.class, new ArgumentSerializer(EntitySummonArgument::entitySummon));
+       register(new ResourceLocation("minecraft:dimension"), DimensionArgument.class, new ArgumentSerializer(DimensionArgument::func_212595_a));
++      quickcarpet.QuickCarpetCommands.registerCustomArgumentTypes();
+    }
+ 
+    @Nullable
