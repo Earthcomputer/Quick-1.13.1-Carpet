@@ -1,0 +1,14 @@
+--- a/net/minecraft/world/biome/Biome.java
++++ b/net/minecraft/world/biome/Biome.java
+@@ -731,6 +731,11 @@
+          this.minGroupCount = minGroupCountIn;
+          this.maxGroupCount = maxGroupCountIn;
+       }
++      
++      /* carpet mod */
++      public int getWeight() {
++          return itemWeight;
++      }
+ 
+       public String toString() {
+          return EntityType.getId(this.entityType) + "*(" + this.minGroupCount + "-" + this.maxGroupCount + "):" + this.itemWeight;

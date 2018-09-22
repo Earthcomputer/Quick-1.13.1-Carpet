@@ -12,6 +12,7 @@ public class QuickCarpetCommands {
         TickCommand.register(dispatcher);
         CounterCommand.register(dispatcher);
         StructureCommand.register(dispatcher);
+        SpawnCommand.register(dispatcher);
     }
     
 }
